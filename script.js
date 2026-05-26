@@ -4,6 +4,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d"); // The brush we use to draw on the canvas
 
+const scoreVal = document.getElementById("scoreVal");
+let score = 0;
+
 // Define our player object properties
 const player = {
     x: 300,        // Start right in the middle horizontally (600 / 2)
@@ -163,6 +166,9 @@ function update() {
     if (player.y + player.size > canvas.height) player.y = canvas.height - player.size;
 
     if (isColliding(player, coin)) {
+        score += 10;
+        scoreVal.innerText = score;
+
         resetCoin(); // Relocate the coin safely
         spawnEnemy();
     }
@@ -193,13 +199,17 @@ function draw() {
     ctx.fillRect(player.x, player.y, player.size, player.size); // Draw the player box: fillRect(x, y, width, height)
 
     if (gameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Semi-transparent dark overlay
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = "#FF3333";
         ctx.font = "bold 36px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "16px sans-serif";
+        ctx.fillText("Refresh the page to try again", canvas.width / 2, canvas.height / 2 + 30);
     }
 }
 
