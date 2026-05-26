@@ -16,4 +16,4 @@ As structure and entites, i have 1 player (as the main square) and 1 coin object
 
 
 ## Here is the walkthrough of game creation with Gemini:
-[Read the AI Diary](./ai_diary.md)
+[AI Diary](./AI_DIARY.md)
