@@ -1,7 +1,6 @@
 
 // INITIALIZATION & SETUP
 
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d"); // The brush we use to draw on the canvas
 
@@ -10,9 +9,15 @@ const player = {
     x: 300,        // Start right in the middle horizontally (600 / 2)
     y: 200,        // Start right in the middle vertically (400 / 2)
     size: 20,      // Width and height of the square in pixels
-    speed: 1.5,      // How many pixels the player moves per frame
+    speed: 2,      // How many pixels the player moves per frame
     dx: 0,         // Current horizontal velocity (delta X)
     dy: 0          // Current vertical velocity (delta Y)
+};
+
+const coin = {
+    x: 0,       // Will be assigned dynamically
+    y: 0,       // Will be assigned dynamically
+    size: 15    // Slightly smaller than the player
 };
 
 // Object to keep track of which keys are currently pressed down
@@ -29,6 +34,36 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => {
     keys[e.key] = false;
 });
+
+
+// NEW HELPER: Move coin to a random position safely away from the player
+function resetCoin() {
+    let randomX, randomY;
+    let distanceToPlayer;
+
+    do {
+        // Generate random coordinates inside the canvas boundaries
+        randomX = Math.random() * (canvas.width - coin.size);
+        randomY = Math.random() * (canvas.height - coin.size);
+        
+        // Calculate the straight-line distance between the coin and the player
+        distanceToPlayer = Math.hypot(randomX - player.x, randomY - player.y);
+
+    } while (distanceToPlayer < 100); // If too close (less than 100px), recalculate!
+
+    // Assign the safe coordinates to the coin
+    coin.x = randomX;
+    coin.y = randomY;
+}
+
+
+// NEW HELPER: Axis-Aligned Bounding Box (AABB) Collision Check
+function isColliding(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.size &&
+           rect1.x + rect1.size > rect2.x &&
+           rect1.y < rect2.y + rect2.size &&
+           rect1.y + rect1.size > rect2.y;
+}
 
 
 // CORE GAME LOOP ENGINE
@@ -57,6 +92,10 @@ function update() {
     if (player.y < 0) player.y = 0;
     if (player.x + player.size > canvas.width) player.x = canvas.width - player.size;
     if (player.y + player.size > canvas.height) player.y = canvas.height - player.size;
+
+    if (isColliding(player, coin)) {
+        resetCoin(); // Relocate the coin safely
+    }
 }
 
 // Render graphics (Clearing and drawing visual frames)
@@ -64,11 +103,12 @@ function draw() {
     // Clear the previous frame completely so the player doesn't leave a "trail"
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set our brush color to neon light blue
-    ctx.fillStyle = "#00E5FF";
+    ctx.fillStyle = "#FFD700";
+    ctx.fillRect(coin.x, coin.y, coin.size, coin.size);
 
-    // Draw the player box: fillRect(x, y, width, height)
-    ctx.fillRect(player.x, player.y, player.size, player.size);
+    // Set our brush color to neon light blue
+    ctx.fillStyle = "#00E5FF";  
+    ctx.fillRect(player.x, player.y, player.size, player.size); // Draw the player box: fillRect(x, y, width, height)
 }
 
 // The heartbeat loop of the game
@@ -81,4 +121,5 @@ function gameLoop() {
 }
 
 // Start the engine!
+resetCoin();
 gameLoop();
