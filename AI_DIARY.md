@@ -49,4 +49,11 @@
 
 - I told Gemini this problem, and it updated the coin creation, ensuring it wont overlap neighter with player, nor with enemies
 
+# Score Calculation
+
+- Handled score calculation 
+
+
+# 
+
 

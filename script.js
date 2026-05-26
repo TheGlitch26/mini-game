@@ -36,6 +36,10 @@ const keys = {};
 // When a key is pressed, set its status to true
 window.addEventListener("keydown", (e) => {
     keys[e.key] = true;
+
+    if (gameOver && (e.key === " " || e.key === "Spacebar" || e.key === "Enter")) {
+        restartGame();
+    }
 });
 
 // When a key is released, set its status to false
@@ -199,17 +203,22 @@ function draw() {
     ctx.fillRect(player.x, player.y, player.size, player.size); // Draw the player box: fillRect(x, y, width, height)
 
     if (gameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = "#FF3333";
         ctx.font = "bold 36px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
 
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = "16px sans-serif";
-        ctx.fillText("Refresh the page to try again", canvas.width / 2, canvas.height / 2 + 30);
+        ctx.font = "20px sans-serif";
+        ctx.fillText("Final Score: " + score, canvas.width / 2, canvas.height / 2 + 20);
+        
+        // UPDATED: Dynamic user instruction prompt
+        ctx.font = "14px sans-serif";
+        ctx.fillStyle = "#A0A0A0";
+        ctx.fillText("Press SPACEBAR or ENTER to Play Again", canvas.width / 2, canvas.height / 2 + 55);
     }
 }
 
@@ -220,6 +229,28 @@ function gameLoop() {
     
     // Tell the browser to run this loop again as fast as possible (60fps)
     requestAnimationFrame(gameLoop);
+}
+
+// NEW HELPER: Reset all game state variables to start a fresh match
+function restartGame() {
+    // 1. Clear out the enemy array completely
+    enemies.length = 0; 
+
+    // 2. Reset score tracking and update HTML text
+    score = 0;
+    scoreVal.innerText = score;
+
+    // 3. Reset player position back to the dead center
+    player.x = 300;
+    player.y = 200;
+    player.dx = 0;
+    player.dy = 0;
+
+    // 4. Position the first coin safely on the clean map
+    resetCoin();
+
+    // 5. Flip the switch to restart the calculations
+    gameOver = false;
 }
 
 // Start the engine!
