@@ -17,3 +17,6 @@ As structure and entites, i have 1 player (as the main square) and 1 coin object
 
 ## Here is the walkthrough of game creation with Gemini:
 [AI Diary](./AI_DIARY.md)
+
+## Check my game here:
+https://theglitch26.github.io/mini-game/
