@@ -5,6 +5,12 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d"); // The brush we use to draw on the canvas
 
 const scoreVal = document.getElementById("scoreVal");
+
+const highScoreVal = document.getElementById("highScoreVal");
+
+let highScore = localStorage.getItem("pixelGameHighScore") || 0;
+
+highScoreVal.innerText = highScore;
 let score = 0;
 
 // Define our player object properties
@@ -181,6 +187,13 @@ function update() {
         let currentEnemy = { x: enemies[i].x, y: enemies[i].y, size: enemySize };
         if (isColliding(player, currentEnemy)) {
             gameOver = true; // Set state to true
+
+            if (score > highScore) {
+                highScore = score;
+                highScoreVal.innerText = highScore;
+                // Save it securely to the browser's memory database
+                localStorage.setItem("pixelGameHighScore", highScore);
+            }
         }
     }
 }
@@ -190,35 +203,56 @@ function draw() {
     // Clear the previous frame completely so the player doesn't leave a "trail"
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw Coin (Gold Box)
     ctx.fillStyle = "#FFD700";
     ctx.fillRect(coin.x, coin.y, coin.size, coin.size);
 
+    // Draw Enemies (Red Boxes)
     ctx.fillStyle = "#FF3333";
     enemies.forEach(enemy => {
         ctx.fillRect(enemy.x, enemy.y, enemySize, enemySize);
     });
 
-    // Set our brush color to neon light blue
+    // Set our brush color to neon light blue and draw player
     ctx.fillStyle = "#00E5FF";  
-    ctx.fillRect(player.x, player.y, player.size, player.size); // Draw the player box: fillRect(x, y, width, height)
+    ctx.fillRect(player.x, player.y, player.size, player.size); 
 
+    // GAME OVER OVERLAY SCREEN
     if (gameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.85)"; // Slightly darker background for better text contrast
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#FF3333";
-        ctx.font = "bold 36px sans-serif";
+        // Set text alignment to center for the overlay text
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
 
+        // 1. GAME OVER HEADER (Y: 140)
+        ctx.fillStyle = "#FF3333";
+        ctx.font = "bold 40px sans-serif";
+        ctx.fillText("GAME OVER", canvas.width / 2, 140);
+
+        // 2. FINAL SCORE DISPLAY (Y: 200)
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = "20px sans-serif";
-        ctx.fillText("Final Score: " + score, canvas.width / 2, canvas.height / 2 + 20);
+        ctx.font = "bold 22px sans-serif";
+        ctx.fillText("Final Score: " + score, canvas.width / 2, 200);
+
+        // 3. DYNAMIC RECORD STATS (Y: 250)
+        if (score === highScore && score > 0) {
+            ctx.fillStyle = "#FFD700"; // Shiny Gold
+            ctx.font = "bold 18px sans-serif";
+            ctx.fillText("👑 NEW RECORD! 👑", canvas.width / 2, 250);
+        } else {
+            ctx.fillStyle = "#AAAAAA";
+            ctx.font = "16px sans-serif";
+            ctx.fillText("High Score to Beat: " + highScore, canvas.width / 2, 250);
+        }
         
-        // UPDATED: Dynamic user instruction prompt
+        // 4. ACTION PROMPT (Y: 310)
         ctx.font = "14px sans-serif";
         ctx.fillStyle = "#A0A0A0";
-        ctx.fillText("Press SPACEBAR or ENTER to Play Again", canvas.width / 2, canvas.height / 2 + 55);
+        ctx.fillText("Press SPACEBAR or ENTER to Play Again", canvas.width / 2, 310);
+
+        // IMPORTANT RESET: Reset alignment back to left so future text runs don't break
+        ctx.textAlign = "left";
     }
 }
 
